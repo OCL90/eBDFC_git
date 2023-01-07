@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Required meta tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <title>eBDFC</title>
+
+    <style>
+        .jumbotron {
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+    </style>
+</head>
+<body>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item active"><a href="{% url 'home' %}">Home</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Pad</li>
+          <li class="breadcrumb-item"><a href="{% url 'sand_types' %}">Sand Types</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'sandInfo' %}">SandInfo</a></li>
+          <li class="breadcrumb-item"><a href="{% url 'setup_job' %}">SetUp</a></li>
+        </ol>
+    </nav>
+    <div class="jumbotron">
+        <form method="POST">
+            <div class="form-group">
+                <label for="inputBoxNumber">Enter crew name to get pad(s) from PropConnect</label>
+                <input type="text" class="col-2 form-control" name="crew" id="inputBoxNumber" required>
+                <button type="submit" class="btn btn-primary">Add</button>
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-danger alert-dismissible fade show col-md-4 offset-md-3" role="alert">
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% csrf_token %}
+        </form>
+    </div>
+
+    <div class="container">
+        <table class="table table-bordered">
+        <thead>
+            <tr>
+            <th scope="col"></th>
+            <th scope="col">Pad Name</th>
+            <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pad in active_jobs %}
+            <tr>
+            <td>{% if pad.working_status %} <span class="badge badge-success">Active</span>{% endif %}</td>
+            <td>{{ pad.name }}</td>
+            <td><a href="{% url 'update_pad' pad.id %}"><button class="btn btn-outline-primary">Edit</button></a>
+                <a href="{% url 'delete_pad' pad.id %}"><button class="btn btn-outline-danger">Delete</button></a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+
+    <div class="container">
+        {% for a_job in active_jobs%}
+        {% if a_job.working_status == 'Active' %}
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+            <label class="form-check-label" for="defaultCheck1">
+                <strong>{{a_job.crew_name}}: </strong>{{a_job.name}}
+            </label>
+            <a href="{% url 'update_active_pad' a_job.id %}"><button class="btn btn-outline-primary">Edit</button></a>
+            <button class="btn btn-outline-danger">Delete</button>
+        </div>
+        {% endif %}
+        {% endfor %}
+
+    </div>
+
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+</body>
+</html>

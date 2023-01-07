@@ -1,0 +1,13 @@
+
+Sand Map
+    - Add boxes to sand map sheet and have the box info pull once added
+    - need to create a model that captures every box used for that stage --> model: well, stage, box#, sand type, starting weight, current weight, Ahead/Behing(optional), vendor BOL
+
+Adding BOL/boxes
+    - Add SI#
+
+Create "Sand Info" template
+    - Dispaly like "SandInfo" tab --> actual sand pumped per sand type(needs to pull from a "sandTrend" model)
+
+Create "SandTrend" template
+    -need to create model Date/Time, well name, stage, design qty, actual sand pumped per sand type

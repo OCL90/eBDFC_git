@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Required meta tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    
+    <title>eBDFC</title>
+
+    <style>
+        table {
+          margin: 10px;
+
+          text-align: center;
+        }
+        .th-sm {
+          position: sticky;
+          top:0;
+        }
+        td{
+          font-size: 12px;
+          vertical-align: bottom;
+          height: 10px;
+        }
+        th {
+          width: 60px;
+        }
+        #pad_name {
+          text-align: center;
+        }
+    </style>
+</head>
+<body>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item active" aria-current="page">Home</li>
+      <li class="breadcrumb-item"><a href="{% url 'pad' %}">Pad</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'sand_types' %}">Sand Types</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'sandInfo' %}">SandInfo</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'setup_job' %}">SetUp</a></li>
+    </ol>
+  </nav>
+
+  <div style="text-align: center;">
+    {% for pad_name in pad%}
+    {% if pad_name.active %}
+    <h1 id="pad_name">{{ pad_name }}</h1>
+    {% endif %}
+    {% endfor %}
+  </div>
+
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb justify-content-center">
+      <li class="breadcrumb-item">Sand types for this job</li>
+      {% for sand_type_each in sand_types %}
+      {% if sand_type_each.used %}
+      <li class="breadcrumb-item"><a href="{% url 'sand_type' sand_type_each.slug %}">{{ sand_type_each.name }}</a></li>
+      {% endif %}
+      {% endfor %}
+    </ol>
+  </nav>
+
+  <div style="text-align: center;">
+    <strong>Well: </strong>
+    {% for well_name in well%}
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="well_name" value="{{well_name.id}}" {%if well_name.current %}checked{% endif %}>
+      <label class="form-check-label">{{ well_name.name }}</label>
+    </div>
+    {% endfor %}
+  </div>
+  <div style="text-align: center;">
+    <strong>Stage: </strong>
+    {% for stage in stage_number%}
+    <div class="form-check form-check-inline">
+      <input class="form-check-input" type="radio" name="stage_number" value="{{ stage.id }}" {% if stage.current %}checked{% endif %}>
+      <label class="form-check-label">{{ stage.stage_number }}</label>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="container">
+  <table class="table table-sm table-hover table-bordered">
+    <thead">
+      <tr>
+        <th scope="col">Box</th>
+        <th scope="col">Sand Type</th>
+        <th scope="col">BOL Weight</th>
+        <th scope="col">Current Weight</th>
+        <th scope="col">Updated Weight</th>
+        <th scope="col">Partial Remaining</th>
+        <th scope="col">CALC OUT</th>
+        <th scope="col">ACTUAL OUT</th>
+        <th scope="col">End Weight</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for bol in all_bols %}
+      {% if bol.stage_number_id == 1 and bol.well_name_id == 2 %}
+      <tr>
+        <td>{{ bol.box_number }}</td>
+        <td>{{ bol.sand_type }}</td>
+        <td>{{ bol.box_weight }}</td>
+        <td>{{ bol.left_on_location }}</td>
+        <td><input type="number" value="{{ bol.left_on_location }}"></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+      <tr>
+        <td scope="row">
+          <form method="POST">
+            {% csrf_token %}
+            <input type="number" name="sand_map_box">
+          </form>
+        </td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-danger alert-dismissible fade show col-md-4 offset-md-3" >
+      {{ message }}
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    {% endfor %}
+  {% endif %}
+  </div>
+
+
+
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+</body>
+</html>

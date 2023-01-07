@@ -1,0 +1,136 @@
+{% load crispy_forms_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    
+    <!-- Required meta tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <title>eBDFC - SetUp</title>
+
+    <style>
+        .container {
+            margin: 50px 150px;
+        }
+        .row a {
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active"><a href="{% url 'home' %}">Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'pad' %}">Pad</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'sand_types' %}">Sand Types</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'sandInfo' %}">SandInfo</a></li>
+            <li class="breadcrumb-item" aria-current="page">SetUp</li>
+        </ol>
+    </nav>
+
+    <div class="container">
+        <div class="row">
+            <!-- Button trigger modal for add_well -->
+            <a href="" class="badge badge-success" data-toggle="modal" data-target="#add_well">+ Add Well</a>
+            <!-- Button trigger modal for add_stage(s) -->
+            <a href="" class="badge badge-secondary" data-toggle="modal" data-target="#add_stage">+ Add Stage</a>
+        </div>
+            <!-- Add Well Modal -->
+            <div class="modal fade" id="add_well" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/setup" method="POST">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="inputBoxNumber">Well Name:</label>
+                                    <input type="text" class="form-control" name="name" required>
+                                </div>
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">Add Well</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        <!-- Add Stage(s) Modal -->
+        <div class="modal fade" id="add_stage" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="/create_stage" method="POST">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="inputState">Well*</label>
+                                <select id="inputState" class="form-control" name="well_name" required>
+                                  <option selected></option>
+                                  {% for well in current_wells_on_pad %}
+                                  <option value="{{well.id}}">{{ well }}</option>
+                                  {% endfor %}
+                                </select>
+                              </div>
+                            {{ stage_form.stage_design_sand | as_crispy_field }}
+                            <div class="form-group">
+                                <label>Stage(s)*</label>
+                                <input type="number" class="form-control col-2 form-check-inline" name="first_stage" required>
+                                <h6 class="form-check-inline">to</h6>
+                                <input type="number" class="form-control col-2 form-check-inline" name="last_stage" required>
+                            </div>
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">Add Stage</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+
+
+    <div class="container">
+        <h4>Current wells on pad</h4>
+        <ul class="list-unstyled">
+            <ul>
+                {% for well in current_wells_on_pad %}
+                <div class="form-group row align-item-center">
+                    <div class="col-8">
+                        <li>{{ well.name }}</li><a href="{% url 'delete_well' well.id %}">
+                        <button class="btn btn-outline-danger">Delete</button></a>
+                    </div>
+                    <div class="col-8">
+                        <h6>Stage -
+                        {% for stage in stage_numbers %}
+                        {% if well.name == stage.well.name %}
+                        <a href="{% url 'update_stage' stage.id %}">{{ stage.stage_number }}</a>
+                        {% endif %}
+                        {% endfor %} </h6>
+                    </div>
+                </div>
+                {% endfor%}
+            </ul>
+        </ul>
+    </div>
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

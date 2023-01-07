@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Required meta tags -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    
+    <title>eBDFC</title>
+
+    <style>
+        .jumbotron {
+            padding-top: 30px;
+            padding-bottom: 30px;
+        }
+        table {
+            margin-left: 10px;
+            text-align: center;
+        }
+        td{
+            font-size: 12px;
+            vertical-align: bottom;
+        }
+        th {
+            width: 60px;
+        }
+    </style>
+</head>
+<body>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{% url 'home' %}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'pad' %}">Pad</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'sand_types' %}">Sand Types</a></li>
+        {% for sand_type in sand_types %}
+        {% if sand_type.used %}
+        <li class="breadcrumb-item justify-content-center"><a href="{% url 'sand_type' sand_type.slug %}">{{ sand_type.name }}</a></li>
+        {% endif %}
+        {% endfor %}
+        <li class="breadcrumb-item"><a href="{% url 'sandInfo' %}">SandInfo</a></li>
+        <li class="breadcrumb-item"><a href="{% url 'setup_job' %}">SetUp</a></li>
+        </ol>
+    </nav>
+
+    <div class="jumbotron">
+        <form method="POST">
+            <div class="form-group">
+                <label for="inputBoxNumber">Enter box number</label>
+                <input type="number" class="col-2 form-control" name="box_number" id="inputBoxNumber" placeholder="Box Number" required>
+                <button type="submit" class="btn btn-primary">Find</button>
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-danger alert-dismissible fade show col-md-4 offset-md-3" >
+                        {{ message }}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            {% csrf_token %}
+        </form>
+    </div>
+
+    <div class="container">
+        <h1 class="col-md-8 offset-md-2">{{ one_sand_type.name }}</h1>
+    </div>
+    <div class="container">
+        <h5 class="col-md-8 offset-md-2"><strong>Total Sand On Location: </strong>{{ sand_total_weight_on_location.total_sand_location }} lbs</h5>
+        <h5 class="col-md-8 offset-md-2"><strong>Total Sand On Location {{ one_sand_type.name }}: </strong>{{ sand_total_per_type.total_sand_location_per_type }} lbs</h5>
+        <h5 class="col-md-8 offset-md-2"><strong>Box Count On Location {{one_sand_type.name}}: </strong>{{ box_count_location_per_type}}</h5>
+    </div>
+
+    <div class="table-responsive wrapper" style="height: 550px;overflow: scroll;">
+      <table class="table table-sm table-hover table-bordered">
+        <thead style="position: sticky;top: 0" class="thead-dark">
+          <tr>
+            <th scope="col">SI Number</th>
+            <th scope="col">Load #</th>
+            <th scope="col">Date</th>
+            <th scope="col">Facility</th>
+            <th scope="col">Approved Miles</th>
+            <th scope="col">Arrived</th>
+            <th scope="col">PO #</th>
+            <th scope="col">PropX ID</th>
+            <th scope="col">Vendor BOL</th>
+            <th scope="col">BOL Weight</th>
+            <th scope="col">Left On Location</th>
+            <th scope="col">Box Number</th>
+            <th scope="col">Carrier Name</th>
+            <th scope="col">Return Weight</th>
+            <th scope="col">Comments</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for bol in bols %}
+          {% if one_sand_type.name in bol.sand_type %}
+          <tr>
+            <th scope="row">{{ bol.si_number}}</th>
+            <td>{{ bol.load_no }}</td>
+            <td>{{ bol.created }}</td>
+            <td>{{ bol.facility_name }}</td>
+            <td>{{ bol.approved_miles }}</td>
+            <td>{{ bol.arrived_time }}</td>
+            <td>{{ bol.po_name }}</td>
+            <td>PropX ID</td>
+            <td>{{ bol.bol_no }}</td>
+            <td>{{ bol.box_weight }}</td>
+            <td>{{ bol.left_on_location }}</td>
+            <td>{{ bol.box_number }}</td>
+            <td>{{ bol.carrier_name }}</td>
+            <td></td>
+            <td>{{ bol.bol_comment_1 }}</td>
+            <td width="100">
+                <button type="button" class="btn btn-outline-primary action_buttons" data-toggle="modal" data-target="#exampleModal">Edit</button>
+                <button type="submit" class="btn btn-outline-danger action_buttons">Delete</button>
+            </td>
+          </tr>
+          {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+</body>
+</html>
